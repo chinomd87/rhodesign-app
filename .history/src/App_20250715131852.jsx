@@ -1,5 +1,5 @@
 // cSpell:ignore Firestore
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   FilePlus2,
@@ -9,24 +9,49 @@ import {
   User,
   ArrowRight,
   UploadCloud,
+  LogOut,
 } from "lucide-react";
-import UploadFlowModal from "./UploadFlowModal";
-import DocumentsDashboard from "./DocumentsDashboard";
-import MFAStatusIndicator from "./MFAStatusIndicator";
+import { useAuth } from "./contexts/AuthContext";
+import UploadFlowModal from "./components/UploadFlowModal";
+import DocumentsDashboard from "./components/DocumentsDashboard";
+import FirebaseConnectionTest from "./components/FirebaseConnectionTest";
+import UserProfile from "./components/UserProfile";
+import WelcomeModal from "./components/WelcomeModal";
 
 // --- Main App Component ---
-export default function MainApp() {
+export default function App() {
   const [view, setView] = useState("dashboard");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const { user, userProfile, loading } = useAuth();
+
+  // Show welcome modal for new users
+  useEffect(() => {
+    if (user && userProfile && !userProfile.onboardingCompleted) {
+      setShowWelcomeModal(true);
+    }
+  }, [user, userProfile]);
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderView = () => {
     switch (view) {
       case "documents":
-        return <DocumentsDashboard userId="demo-user-123" />;
+        return <DocumentsDashboard userId={user?.uid} />;
       case "templates":
         return <TemplatesView />;
       case "settings":
-        return <SettingsView />;
+        return <UserProfile />;
       case "dashboard":
       default:
         return (
@@ -50,6 +75,12 @@ export default function MainApp() {
       {isUploadModalOpen && (
         <UploadFlowModal onClose={() => setIsUploadModalOpen(false)} />
       )}
+      {showWelcomeModal && (
+        <WelcomeModal
+          isOpen={showWelcomeModal}
+          onClose={() => setShowWelcomeModal(false)}
+        />
+      )}
     </div>
   );
 }
@@ -57,6 +88,8 @@ export default function MainApp() {
 // --- Layout Components ---
 
 function Sidebar({ view, setView }) {
+  const { user, userProfile, logout } = useAuth();
+
   const navItems = [
     { id: "dashboard", icon: FilePlus2, label: "Start Signing" },
     { id: "documents", icon: FileText, label: "Documents" },
@@ -64,9 +97,12 @@ function Sidebar({ view, setView }) {
     { id: "settings", icon: Settings, label: "Settings" },
   ];
 
-  const handleMFAClick = () => {
-    // Navigate to MFA dashboard
-    window.location.href = '/mfa';
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   return (
@@ -92,42 +128,34 @@ function Sidebar({ view, setView }) {
             </li>
           ))}
         </ul>
-        
-        {/* Security Section */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-            Security
-          </p>
-          <button
-            onClick={handleMFAClick}
-            className="w-full flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span className="ml-3">Multi-Factor Auth</span>
-          </button>
-          
-          {/* MFA Status Indicator */}
-          <div className="mt-3 px-4">
-            <MFAStatusIndicator showDetails={true} complianceLevel="advanced" />
-          </div>
-        </div>
       </nav>
       <div className="px-4 py-4 border-t border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+        <div className="flex items-center mb-3">
+          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+            {user?.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt="Profile"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
               <User className="w-6 h-6 text-indigo-600" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-semibold text-gray-800">Matthew D.</p>
-              <p className="text-xs text-gray-500">Pro Plan</p>
-            </div>
+            )}
           </div>
-          {/* Compact MFA indicator in user area */}
-          <MFAStatusIndicator showDetails={false} complianceLevel="advanced" />
+          <div className="ml-3 flex-1">
+            <p className="text-sm font-semibold text-gray-800">
+              {userProfile?.displayName || user?.displayName || "User"}
+            </p>
+            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+          </div>
         </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Sign Out
+        </button>
       </div>
     </aside>
   );
@@ -150,10 +178,17 @@ function Header({ openUploadModal }) {
 // --- View Components ---
 
 function Dashboard({ setView, openUploadModal }) {
+  const { user, userProfile } = useAuth();
+  const displayName =
+    userProfile?.displayName ||
+    user?.displayName ||
+    user?.email?.split("@")[0] ||
+    "there";
+
   return (
     <div>
       <h2 className="text-3xl font-semibold text-gray-800">
-        Welcome back, Matthew
+        Welcome back, {displayName}
       </h2>
       <p className="text-gray-500 mt-1">
         Ready to get a document signed? Start a new signature request.
@@ -204,6 +239,13 @@ function Dashboard({ setView, openUploadModal }) {
 
       <div className="mt-10">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">
+          Firebase Connection Status
+        </h3>
+        <FirebaseConnectionTest />
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">
           Recent Activity
         </h3>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -218,21 +260,6 @@ function Dashboard({ setView, openUploadModal }) {
 
 // --- Placeholder View Components ---
 
-function DocumentsView() {
-  return (
-    <div>
-      <h2 className="text-3xl font-semibold text-gray-800">Documents</h2>
-      <p className="text-gray-500 mt-1">
-        Manage all of your signature requests.
-      </p>
-      <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <p className="text-center text-gray-500 py-16">
-          Document list will appear here.
-        </p>
-      </div>
-    </div>
-  );
-}
 function TemplatesView() {
   return (
     <div>

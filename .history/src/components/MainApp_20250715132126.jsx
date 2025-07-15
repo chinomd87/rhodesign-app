@@ -107,26 +107,17 @@ function Sidebar({ view, setView }) {
             </svg>
             <span className="ml-3">Multi-Factor Auth</span>
           </button>
-          
-          {/* MFA Status Indicator */}
-          <div className="mt-3 px-4">
-            <MFAStatusIndicator showDetails={true} complianceLevel="advanced" />
-          </div>
         </div>
       </nav>
       <div className="px-4 py-4 border-t border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
-              <User className="w-6 h-6 text-indigo-600" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-semibold text-gray-800">Matthew D.</p>
-              <p className="text-xs text-gray-500">Pro Plan</p>
-            </div>
+        <div className="flex items-center">
+          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+            <User className="w-6 h-6 text-indigo-600" />
           </div>
-          {/* Compact MFA indicator in user area */}
-          <MFAStatusIndicator showDetails={false} complianceLevel="advanced" />
+          <div className="ml-3">
+            <p className="text-sm font-semibold text-gray-800">Matthew D.</p>
+            <p className="text-xs text-gray-500">Pro Plan</p>
+          </div>
         </div>
       </div>
     </aside>

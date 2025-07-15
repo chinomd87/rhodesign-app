@@ -444,19 +444,6 @@ const SigningPage = () => {
           onCancel={() => setShowSignatureCanvas(false)}
         />
       )}
-
-      {/* MFA Verification Modal */}
-      {showMFAModal && user && (
-        <MFAVerificationModal
-          isOpen={showMFAModal}
-          onClose={handleMFACancel}
-          onVerify={handleMFAVerification}
-          userId={user.uid}
-          operation="document_signing"
-          complianceLevel="advanced"
-          title="Verify Identity to Sign Document"
-        />
-      )}
     </div>
   );
 };

@@ -123,116 +123,24 @@ const SigningPage = () => {
         userAgent: navigator.userAgent,
       };
 
-      // Check if MFA is required for this signature
-      if (user && document?.requiresMFA) {
-        const mfaCheck = await MFAIntegrationService.requireMFAForOperation(
-          user.uid,
-          'document_signing'
-        );
-
-        if (mfaCheck.required && !mfaCheck.verified) {
-          // Store signature data and show MFA modal
-          setPendingSignatureData({
-            signatureData,
-            clientInfo,
-            documentId,
-            signerId
-          });
-          setMfaRequired(true);
-          setShowMFAModal(true);
-          setSigning(false);
-          return;
-        }
-      }
-
-      // Proceed with signature completion
-      await completeSignatureProcess(signatureData, clientInfo);
-
-    } catch (error) {
-      console.error("Error submitting signature:", error);
-      setError("Failed to submit signature. Please try again.");
-      setSigning(false);
-    }
-  };
-
-  const completeSignatureProcess = async (signatureData, clientInfo, mfaVerification = null) => {
-    try {
-      let result;
-
-      if (user && mfaVerification) {
-        // Use MFA-protected signature
-        result = await MFAIntegrationService.createMFAProtectedSignature({
-          userId: user.uid,
-          certificateId: document.certificateId, // Assuming document has a certificate
-          data: signatureData,
-          documentId,
-          mfaCode: mfaVerification.code,
-          mfaMethod: mfaVerification.method,
-          includeTimestamp: true
-        });
-
-        // Complete the signing with enhanced signature
-        await SigningService.completeSignature(
-          documentId,
-          signerId,
-          {
-            ...signatureData,
-            mfaEnhanced: true,
-            mfaMethod: mfaVerification.method,
-            enhancedSignature: result.signature
-          },
-          clientInfo
-        );
-      } else {
-        // Standard signature completion
-        result = await SigningService.completeSignature(
-          documentId,
-          signerId,
-          signatureData,
-          clientInfo
-        );
-      }
+      const result = await SigningService.completeSignature(
+        documentId,
+        signerId,
+        signatureData,
+        clientInfo
+      );
 
       if (result.success) {
-        navigate("/signature-complete", {
-          state: { 
-            documentId, 
-            signerId,
-            mfaProtected: !!mfaVerification
-          },
-        });
-      } else {
-        setError("Failed to complete signature");
+        // Show success message and redirect
+        alert("Document signed successfully!");
+        navigate("/signature-complete");
       }
-    } catch (error) {
-      console.error("Error completing signature:", error);
-      setError("Failed to complete signature. Please try again.");
+    } catch (err) {
+      console.error("Error signing document:", err);
+      setError("Failed to sign document. Please try again.");
     } finally {
       setSigning(false);
-      setPendingSignatureData(null);
     }
-  };
-
-  const handleMFAVerification = async (mfaResult) => {
-    if (mfaResult.success && pendingSignatureData) {
-      const { signatureData, clientInfo } = pendingSignatureData;
-      setShowMFAModal(false);
-      setSigning(true);
-      
-      await completeSignatureProcess(signatureData, clientInfo, mfaResult);
-    } else {
-      setError('MFA verification failed. Please try again.');
-      setShowMFAModal(false);
-      setSigning(false);
-      setPendingSignatureData(null);
-    }
-  };
-
-  const handleMFACancel = () => {
-    setShowMFAModal(false);
-    setSigning(false);
-    setPendingSignatureData(null);
-    setMfaRequired(false);
   };
 
   const allFieldsCompleted = () => {
@@ -442,19 +350,6 @@ const SigningPage = () => {
         <SignatureCanvas
           onSignatureComplete={handleSignatureComplete}
           onCancel={() => setShowSignatureCanvas(false)}
-        />
-      )}
-
-      {/* MFA Verification Modal */}
-      {showMFAModal && user && (
-        <MFAVerificationModal
-          isOpen={showMFAModal}
-          onClose={handleMFACancel}
-          onVerify={handleMFAVerification}
-          userId={user.uid}
-          operation="document_signing"
-          complianceLevel="advanced"
-          title="Verify Identity to Sign Document"
         />
       )}
     </div>

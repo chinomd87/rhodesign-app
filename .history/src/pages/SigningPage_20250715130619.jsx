@@ -234,6 +234,22 @@ const SigningPage = () => {
     setPendingSignatureData(null);
     setMfaRequired(false);
   };
+        signatureData,
+        clientInfo
+      );
+
+      if (result.success) {
+        // Show success message and redirect
+        alert("Document signed successfully!");
+        navigate("/signature-complete");
+      }
+    } catch (err) {
+      console.error("Error signing document:", err);
+      setError("Failed to sign document. Please try again.");
+    } finally {
+      setSigning(false);
+    }
+  };
 
   const allFieldsCompleted = () => {
     const signerFields = getSignerFields();
@@ -442,19 +458,6 @@ const SigningPage = () => {
         <SignatureCanvas
           onSignatureComplete={handleSignatureComplete}
           onCancel={() => setShowSignatureCanvas(false)}
-        />
-      )}
-
-      {/* MFA Verification Modal */}
-      {showMFAModal && user && (
-        <MFAVerificationModal
-          isOpen={showMFAModal}
-          onClose={handleMFACancel}
-          onVerify={handleMFAVerification}
-          userId={user.uid}
-          operation="document_signing"
-          complianceLevel="advanced"
-          title="Verify Identity to Sign Document"
         />
       )}
     </div>
