@@ -321,45 +321,9 @@ export class PKIService {
   }
 
   /**
-   * Create digital signature with trusted timestamp
+   * Create digital signature using PKI certificate
    * @param {Object} signatureRequest - Signature request parameters
    */
-  async createDigitalSignatureWithTimestamp(signatureRequest) {
-    const {
-      certificateId,
-      data,
-      documentId,
-      userId,
-      timestampProvider = 'digicert',
-      includeQualifiedTimestamp = true
-    } = signatureRequest;
-
-    try {
-      // Use the timestamp integration service for enhanced signatures
-      const result = await TimestampIntegrationService.createTimestampedSignature({
-        certificateId,
-        data,
-        documentId,
-        userId,
-        timestampProvider,
-        includeQualifiedTimestamp
-      });
-
-      return {
-        success: true,
-        signatureId: result.signatureId,
-        timestampedSignature: result.timestampedSignature,
-        timestampTime: result.timestampTime,
-        legalValue: result.legalValue,
-        qualified: result.qualified,
-        provider: result.provider
-      };
-
-    } catch (error) {
-      console.error('Timestamped digital signature creation failed:', error);
-      throw error;
-    }
-  }
   async createDigitalSignature(signatureRequest) {
     const {
       certificateId,
