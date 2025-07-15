@@ -1,4 +1,5 @@
 {
+  "_comment": "cSpell:ignore rhodesign firestore uuidv",
   "name": "rhodesign-app",
   "private": true,
   "version": "0.0.0",
@@ -7,7 +8,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "firebase:deploy": "./deploy-firebase.sh",
+    "firebase:rules": "firebase deploy --only firestore:rules,storage",
+    "firebase:hosting": "npm run build && firebase deploy --only hosting",
+    "firebase:init": "firebase init",
+    "firebase:login": "firebase login"
   },
   "dependencies": {
     "canvas-signature": "^1.0.0",
@@ -24,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@tailwindcss/postcss": "^4.1.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",

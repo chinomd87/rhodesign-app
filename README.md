@@ -1,66 +1,85 @@
 # RhodeSign - E-Signature Platform
 
-RhodeSign is a modern, secure e-signature platform built with React and Firebase. It allows users to upload documents, add signers, place signature fields, and manage the entire signing workflow.
+<!-- cSpell:ignore rhodesign Firestore -->
+
+RhodeSign is a modern, secure e-signature platform built with React and Firebase. It allows users to upload documents, add signers, place signature fields, and manage the entire signing workflow with real-time updates and comprehensive audit trails.
 
 ## 🚀 Features
 
 ### Phase 1 (Current Implementation)
-- **Document Upload & Processing** - Secure PDF upload with Firebase Storage
-- **Multi-step Signature Workflow** - Intuitive 4-step process for creating signature requests
-- **Signature Capture** - Canvas-based signature drawing with real-time preview
-- **Signer Management** - Add multiple signers with email notifications
-- **Document Status Tracking** - Real-time status updates (Draft, Out for Signature, Completed)
-- **Audit Trail** - Comprehensive logging of all document actions
-- **Responsive Design** - Modern UI built with Tailwind CSS
 
-### Planned Features (Phase 2+)
-- **Template System** - Save and reuse documents with pre-placed fields
-- **Multi-Signer Sequential Workflows** - Advanced signing order management
-- **Advanced Field Placement** - Drag-and-drop field positioning on PDF preview
-- **Identity Verification** - Multi-factor authentication for signers
-- **API Integration** - RESTful API for third-party integrations
-- **Team Management** - Organization and role-based access control
+- **Firebase Integration** - Full Firebase backend with Firestore, Storage, and real-time updates
+- **Document Upload & Processing** - Secure PDF/document upload with Firebase Storage
+- **Real-time Document Dashboard** - Live document status updates with Firebase listeners
+- **Multi-step Signature Workflow** - Intuitive 4-step process for creating signature requests
+- **Signature Capture** - Canvas-based signature drawing with secure storage
+- **Signer Management** - Add multiple signers with proper validation
+- **Document Status Tracking** - Real-time status updates (Draft, Out for Signature, Completed)
+- **Comprehensive Audit Trail** - Complete logging of all document actions with timestamps
+- **Secure Document Signing** - Protected signing links with validation
+- **Responsive Design** - Modern UI built with Tailwind CSS and React components
+
+### Recently Completed ✅
+
+- **Fine-Grained Authorization (FGA)** - Externalized authorization system combining RBAC, ReBAC, and ABAC
+- **Advanced Permission Management** - Role-based access control with relationship and attribute-based policies
+- **Security Enhancements** - Policy-driven security with comprehensive audit trails
+- **Admin Dashboard** - FGA management interface for policies and permissions
+- **Code Quality Improvements** - ESLint/SonarQube compliance and accessibility fixes
+
+### In Development 🔄
+
+- **Enhanced User Management** - User profiles, organization management, team structures
+- **Template System** - Save and reuse documents with pre-configured fields
+- **Advanced PDF Processing** - Interactive PDF viewer with drag-and-drop field placement
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19, Vite, Tailwind CSS
 - **Backend**: Firebase (Firestore, Storage, Functions, Auth)
+- **Real-time Data**: Firestore real-time listeners
 - **UI Components**: Lucide React icons
-- **PDF Processing**: pdf-lib
+- **PDF Processing**: pdf-lib, react-pdf
 - **Routing**: React Router DOM
+- **State Management**: React hooks and context
 - **State Management**: React Hooks
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - Firebase project with Firestore and Storage enabled
 
 ## 🔧 Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/your-username/rhodesign-app.git
 cd rhodesign-app
 ```
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. Configure Firebase:
-   - Update `src/firebase/config.js` with your Firebase project credentials
+1. Configure Firebase:
+
+   - Copy `.env.example` to `.env` and fill in your Firebase configuration
+   - Follow the detailed setup guide in `FIREBASE_SETUP.md`
    - Ensure Firestore and Storage are enabled in your Firebase console
 
-4. Start the development server:
+1. Start the development server:
+
 ```bash
 npm run dev
 ```
 
 ## 🏗️ Project Structure
 
-```
+```text
 src/
 ├── components/          # Reusable UI components
 │   ├── MainApp.jsx     # Main application layout
@@ -105,10 +124,13 @@ src/
 
 ## 🛣️ Development Roadmap
 
-- **Phase 1**: ✅ Core signing workflow (Current)
-- **Phase 2**: 🔄 Advanced features & user management
-- **Phase 3**: 📋 Security, compliance & production readiness
-- **Phase 4**: 💰 Monetization & team features
+- **Phase 1**: ✅ Core Foundation (Complete)
+- **Phase 2**: 🔄 Advanced Features & Security (60% Complete)
+- **Phase 3**: 📋 Enterprise Security & Compliance (Planned Q4 2025)
+- **Phase 4**: 🚀 Platform & Integrations (Planned Q2 2026)
+- **Phase 5**: 💰 Monetization & Growth (Planned Q4 2026)
+
+See [ROADMAP.md](ROADMAP.md) for detailed timeline and features.
 
 ## 🤝 Contributing
 
@@ -124,7 +146,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@rhodesign.com or create an issue in this repository.
+For support, email [support@rhodesign.com](mailto:support@rhodesign.com) or create an issue in this repository.
 
 ---
 
